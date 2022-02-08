@@ -25,7 +25,10 @@
 
   <br><br><span style="font-size: 25px;"><center><b><u>For Developers</u></b></center></span>
   <br><span style="font-size: 20px;"><center><b>Your One Time Payment Token (Card) is: </b><input name="payment_source_token" id="payment_source_token" style="width: 300px;" readonly></center></span><br>
-  <br><center><h1 style="font-size: 20px;">Your One Time Payment Token (PayPal) is: <span id="paypal_token">test </span></center></h1><br>
+  <br><center><h1 style="font-size: 20px;">Your One Time Payment Token (PayPal) is: <script>
+    document.write(wallet_token)
+  </script>
+  </h1><br>
 
   <script src="https://app-sandbox.paydock.com/v1/widget.umd.js" ></script>
   <script>
@@ -112,7 +115,6 @@
             button.load();
           })
           .catch(error => console.log('error', error));
-          document.getElementById("paypal_token").innerHTML = wallet_token;
       }
 
       //When widget completes action
