@@ -47,7 +47,7 @@
 
       //Wallet Token Variable
       var wallet_token = ''
-      
+      let button = null;
 
       //Wallet Token API
       var myHeaders = new Headers();
@@ -74,40 +74,64 @@
       fetch("https://api-sandbox.paydock.com/v1/charges/wallet", requestOptions)
         .then(response => response.json())
         .then(result => {
-          console.log(result); 
           wallet_token = result['resource']['data']['token'];
           console.log(wallet_token);
+          button = new paydock.WalletButtons(
+            "#widget",
+            wallet_token,
+            {
+              request_shipping: true,
+              pay_later: true,
+              style: {
+                layout: 'horizontal',
+                color: 'blue',
+                shape: 'rect',
+                label: 'paypal',
+              },
+            });
+
+          button.setEnv('sandbox');
+          button.onUnavailable(() => console.log("No wallet buttons available"));
+          button.onUpdate((data) => {
+          console.log("Updating amount via a backend to backend call to POST charges/:id");
+          // call `POST charges/:id` to modify charge
+          button.update({ success: true });
+        });
+          button.onPaymentSuccessful((data) => console.log("The payment was successful"));
+          button.onPaymentError((data) => console.log("The payment was not successful"));
+          button.onPaymentInReview((data) => console.log("The payment is on fraud review"));
+          button.load();
         })
         .catch(error => console.log('error', error));
 
         
 
-      //Paypal Checkout Button
-      let button = new paydock.WalletButtons(
-        "#widget",
-        wallet_token,
-        {
-          request_shipping: true,
-          pay_later: true,
-          style: {
-            layout: 'horizontal',
-            color: 'blue',
-            shape: 'rect',
-            label: 'paypal',
-          },
-        }
-      );
-        button.setEnv('sandbox');
-        button.onUnavailable(() => console.log("No wallet buttons available"));
-        button.onUpdate((data) => {
-        console.log("Updating amount via a backend to backend call to POST charges/:id");
-        // call `POST charges/:id` to modify charge
-        button.update({ success: true });
-      });
-        button.onPaymentSuccessful((data) => console.log("The payment was successful"));
-        button.onPaymentError((data) => console.log("The payment was not successful"));
-        button.onPaymentInReview((data) => console.log("The payment is on fraud review"));
-        button.load();
+      // //Paypal Checkout Button
+      // let button = new paydock.WalletButtons(
+      //   "#widget",
+      //   wallet_token,
+      //   {
+      //     request_shipping: true,
+      //     pay_later: true,
+      //     style: {
+      //       layout: 'horizontal',
+      //       color: 'blue',
+      //       shape: 'rect',
+      //       label: 'paypal',
+      //     },
+      //   }
+      // );
+      //   button.setEnv('sandbox');
+      //   button.onUnavailable(() => console.log("No wallet buttons available"));
+      //   button.onUpdate((data) => {
+      //   console.log("Updating amount via a backend to backend call to POST charges/:id");
+      //   // call `POST charges/:id` to modify charge
+      //   button.update({ success: true });
+      // });
+      //   button.onPaymentSuccessful((data) => console.log("The payment was successful"));
+      //   button.onPaymentError((data) => console.log("The payment was not successful"));
+      //   button.onPaymentInReview((data) => console.log("The payment is on fraud review"));
+      //   button.load();
 
 
       //When widget completes action
