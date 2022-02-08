@@ -76,10 +76,11 @@
         .then(result => {
           console.log(result); 
           wallet_token = result['resource']['data']['token'];
+          console.log(wallet_token);
         })
         .catch(error => console.log('error', error));
 
-        console.log(wallet_token)
+        
 
       //Paypal Checkout Button
       let button = new paydock.WalletButtons(
