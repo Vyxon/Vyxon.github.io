@@ -15,7 +15,7 @@
       finish-text= "Thank you, your bid has been successfully accepted"></div>
   </form>
     
-    <br><center><button type="button" style="width: 275px; height: 60px; font-size: 30px;">Pay with PayPal</button></center>
+    <br><center><button id="Paypal_Button" type="button" style="width: 275px; height: 60px; font-size: 30px;" onclick="paypalcharge();">Pay with PayPal</button></center>
     <br><br><span style="font-size: 25px;"><center><b><u>For Developers</u></b></center></span>
     <br><span style="font-size: 20px;"><center><b>Your One Time Payment Token (Card) is: </b><input name="payment_source_token" id="payment_source_token" style="width: 300px;" readonly></center></span><br>
 
@@ -70,41 +70,41 @@
         body: raw,
         redirect: 'follow'
       };
+      function paypalcharge() {
+        fetch("https://api-sandbox.paydock.com/v1/charges/wallet", requestOptions)
+          .then(response => response.json())
+          .then(result => {
+            wallet_token = result['resource']['data']['token'];
+            console.log(wallet_token);
+            //Initialising PayPal Button
+            button = new paydock.WalletButtons(
+              "#widget",
+              wallet_token,
+              {
+                request_shipping: true,
+                pay_later: true,
+                style: {
+                  layout: 'horizontal',
+                  color: 'blue',
+                  shape: 'rect',
+                  label: 'paypal',
+                },
+              });
 
-      fetch("https://api-sandbox.paydock.com/v1/charges/wallet", requestOptions)
-        .then(response => response.json())
-        .then(result => {
-          wallet_token = result['resource']['data']['token'];
-          console.log(wallet_token);
-          //Initialising PayPal Button
-          button = new paydock.WalletButtons(
-            "#widget",
-            wallet_token,
-            {
-              request_shipping: true,
-              pay_later: true,
-              style: {
-                layout: 'horizontal',
-                color: 'blue',
-                shape: 'rect',
-                label: 'paypal',
-              },
-            });
-
-          button.setEnv('sandbox');
-          button.onUnavailable(() => console.log("No wallet buttons available"));
-          button.onUpdate((data) => {
-          console.log("Updating amount via a backend to backend call to POST charges/:id");
-          // call `POST charges/:id` to modify charge
-          button.update({ success: true });
-        });
-          button.onPaymentSuccessful((data) => console.log("The payment was successful"));
-          button.onPaymentError((data) => console.log("The payment was not successful"));
-          button.onPaymentInReview((data) => console.log("The payment is on fraud review"));
-          button.load();
-        })
-        .catch(error => console.log('error', error));
-
+            button.setEnv('sandbox');
+            button.onUnavailable(() => console.log("No wallet buttons available"));
+            button.onUpdate((data) => {
+            console.log("Updating amount via a backend to backend call to POST charges/:id");
+            // call `POST charges/:id` to modify charge
+            button.update({ success: true });
+          });
+            button.onPaymentSuccessful((data) => console.log("The payment was successful"));
+            button.onPaymentError((data) => console.log("The payment was not successful"));
+            button.onPaymentInReview((data) => console.log("The payment is on fraud review"));
+            button.load();
+          })
+          .catch(error => console.log('error', error));
+      }
 
       //When widget completes action
       widget.on('finish', function (data) {
